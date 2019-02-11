@@ -18,7 +18,7 @@ class Version
     }
 
     /**
-     * Get last releases
+     * Get last releases (8.x and 7.x)
      * @return mixed
      */
     public function get_last_releases()
@@ -86,7 +86,7 @@ class Version
     }
 
     /**
-     * Get last security releases
+     * Get last security releases (8.x and 7.x)
      * @return mixed
      */
     public function get_last_security_releases()
