@@ -1,0 +1,23 @@
+{
+  "name": "gmo/dsv",
+  "authors": [
+    {
+      "name": "Gregory Monseur",
+      "email": "hello@gmonseur.be"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "Symfony/Finder": "^4.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Gmo\\Dsv\\": "./src/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
+
