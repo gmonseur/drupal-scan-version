@@ -1,57 +1,96 @@
 <?php
 require_once 'config.php';
 
-use Gmo\Dsv\Version;
+use Gmo\Dsv\DrupalFinder;
 use Symfony\Component\Finder\Finder;
 
 prof_flag('Start');
-
-$version = new Version($config['api_url']);
-//$last_release = $version->get_last_releases();
-//$last_security_release = $version->get_last_security_releases();
-$releases_8x = $version->get_last_releases_from_tag('8.2.0');
-$test = $version->get_releases('8.x', ['tag' => '8.2.0', 'security' => true]);
-//trace($last_release);
-//trace($last_security_release);
-trace($releases_8x);
-trace($test);
-prof_flag('Version');
-//echo version_compare('8.69', '8.67');
-
-////////////////////////////////////////////////
-
 $path = realpath('../');
 $depth = ['> 2', '< 6'];
 
+// Symfony Finder
 $finder = new Finder();
 $finder->in($path)->path(['core/lib', 'includes'])->name(['Drupal.php', 'bootstrap.inc'])->depth($depth);
 
-foreach ($finder as $file) {
-    // dumps the absolute path
-    $contents = $file->getContents();
-    $needle = "VERSION";
-    $pos = strpos($contents, $needle);
-    if ($pos) {
-        trace($file->getRelativePathname());
-        trace($file->getPath());
-        $version = substr($contents, $pos + strlen($needle) + 1, 10);
-        $version = getBetween($version, "'", "'");
-        echo $version;
-    }
-}
+$drupalfinder = new DrupalFinder($finder, $config);
+$websites = $drupalfinder->getContents();
 prof_flag('End');
-
 ?>
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drupal Scan Version</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 </head>
 <body>
-<?php echo prof_print(); ?>
+<section class="section">
+    <div class="container">
+        <h1 class="title">Drupal Scan Version</h1>
+        <p class="subtitle">
+            Versions 7.x - 8.x
+        </p>
+
+        <table class="table is-hoverable is-fullwidth">
+            <thead>
+            <tr>
+                <th>Project</th>
+                <th>Version</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tfoot>
+            <tr>
+                <th>Project</th>
+                <th>Version</th>
+                <th>Status</th>
+            </tr>
+            </tfoot>
+            <tbody>
+            <?php
+            foreach ($websites as $website):
+                if ($website->status == 'Up to date') {
+                    $class_tag = 'is-primary';
+                } elseif ($website->status == 'Security update') {
+                    $class_tag = 'is-danger';
+                } else {
+                    $class_tag = 'is-warning';
+                }
+                ?>
+                <tr>
+                    <td>
+                        <div class="columns is-multiline is-mobile">
+                            <div class="column is-full">
+                                <strong><?php echo $website->path; ?></strong>
+                            </div>
+                            <?php if (!empty($website->releases)): ?>
+                                <div class="column is-full content is-small">
+                                    <?php foreach ($website->releases as $release): ?>
+                                        <p><?php echo $release['release_type'] . ' : <a href="' . $release['release_link'] . '" target="_blank">' . $release['version'] . '</a> (' . $release['date'] . ')'; ?></p>
+                                    <?php endforeach; ?>
+                                </div>
+
+                            <?php endif; ?>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tags has-addons are-medium">
+                            <span class="tag is-dark">Drupal</span>
+                            <span class="tag <?php echo $class_tag ?>"><?php echo $website->version; ?></span>
+                        </div>
+                    </td>
+                    <td><?php echo $website->status; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <p class="content is-small">
+            <?php prof_print(); ?>
+        </p>
+    </div>
+
+</section>
 </body>
 </html>
