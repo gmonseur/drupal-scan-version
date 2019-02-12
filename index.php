@@ -2,6 +2,9 @@
 require_once 'config.php';
 
 use Gmo\Dsv\Version;
+use Symfony\Component\Finder\Finder;
+
+prof_flag('Start');
 
 $version = new Version($config['api_url']);
 //$last_release = $version->get_last_releases();
@@ -12,16 +15,18 @@ $test = $version->get_releases('8.x', ['tag' => '8.2.0', 'security' => true]);
 //trace($last_security_release);
 trace($releases_8x);
 trace($test);
+prof_flag('Version');
+//echo version_compare('8.69', '8.67');
 
-echo version_compare('8.69', '8.67');
 ////////////////////////////////////////////////
 
-/*
 $path = realpath('../');
 $find = 'core/lib';
 $depth = ['> 2', '< 6'];
 
 $finder = new Finder();
+//$exclusions = [''];
+//$finder->notPath($exclusions);
 $finder->in($path)->path('core/lib')->name('Drupal.php')->depth($depth);
 
 foreach ($finder as $file) {
@@ -36,7 +41,8 @@ foreach ($finder as $file) {
     $version = getBetween($version, "'", "'");
     echo $version;
 }
-*/
+prof_flag('End');
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -48,6 +54,6 @@ foreach ($finder as $file) {
     <title>Document</title>
 </head>
 <body>
-
+<?php echo prof_print();?>
 </body>
 </html>
