@@ -21,25 +21,23 @@ prof_flag('Version');
 ////////////////////////////////////////////////
 
 $path = realpath('../');
-$find = 'core/lib';
 $depth = ['> 2', '< 6'];
 
 $finder = new Finder();
-//$exclusions = [''];
-//$finder->notPath($exclusions);
-$finder->in($path)->path('core/lib')->name('Drupal.php')->depth($depth);
+$finder->in($path)->path(['core/lib', 'includes'])->name(['Drupal.php', 'bootstrap.inc'])->depth($depth);
 
 foreach ($finder as $file) {
     // dumps the absolute path
-    trace($file->getRelativePathname());
-    trace($file->getPath());
-
     $contents = $file->getContents();
     $needle = "VERSION";
     $pos = strpos($contents, $needle);
-    $version = substr($contents, $pos + strlen($needle), 10);
-    $version = getBetween($version, "'", "'");
-    echo $version;
+    if ($pos) {
+        trace($file->getRelativePathname());
+        trace($file->getPath());
+        $version = substr($contents, $pos + strlen($needle) + 1, 10);
+        $version = getBetween($version, "'", "'");
+        echo $version;
+    }
 }
 prof_flag('End');
 
@@ -54,6 +52,6 @@ prof_flag('End');
     <title>Document</title>
 </head>
 <body>
-<?php echo prof_print();?>
+<?php echo prof_print(); ?>
 </body>
 </html>
