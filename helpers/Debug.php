@@ -19,7 +19,7 @@
 if (!function_exists('trace')) {
     function trace($var, $isOpen = false, $mode_debug = MODE_DEBUG)
     {
-        if($mode_debug) {
+        if ($mode_debug) {
             $debug = debug_backtrace();
             $lUniqId = uniqid(md5(rand()));
 
@@ -64,6 +64,45 @@ if (!function_exists('write_log')) {
         fclose($fp);
 
         return TRUE;
+    }
+}
+
+/**
+ * Profiling
+ * Call this at each point of interest, passing a descriptive string
+ * @param $str
+ */
+if (!function_exists('prof_flag')) {
+    function prof_flag($str)
+    {
+        global $prof_timing, $prof_names;
+        $prof_timing[] = microtime(true);
+        $prof_names[] = $str;
+    }
+}
+
+
+/**
+ * Profiling
+ * Call this when you're done and want to see the results
+ */
+if (!function_exists('prof_print')) {
+    function prof_print()
+    {
+        global $prof_timing, $prof_names;
+        $size = count($prof_timing);
+        $prof_tot_time = 0;
+        echo "-- Profiling ---------------------------------<br>";
+        for ($i = 0; $i < $size - 1; $i++) {
+            echo "<b>{$prof_names[$i]}</b><br>";
+            $prof_time_fork = $prof_timing[$i + 1] - $prof_timing[$i];
+            echo sprintf("&nbsp;&nbsp;&nbsp;&nbsp;%f<br>", $prof_time_fork);
+            $prof_tot_time = $prof_tot_time + $prof_time_fork;
+        }
+        echo "<b>{$prof_names[$size-1]}</b><br><br>";
+        echo "<b>Total Time</b><br>";
+        echo "&nbsp;&nbsp;&nbsp;&nbsp; $prof_tot_time<br>";
+        echo "----------------------------------------------<br>";
     }
 }
 
