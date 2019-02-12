@@ -81,7 +81,6 @@ if (!function_exists('prof_flag')) {
     }
 }
 
-
 /**
  * Profiling
  * Call this when you're done and want to see the results
