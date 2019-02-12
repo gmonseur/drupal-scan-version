@@ -66,6 +66,7 @@ class Version
                 $releases[$i] = array(
                     'name' => $item->name,
                     'version' => $item->version,
+                    'date' => date("d M Y", (int)$item->date),
                     'release_link' => $item->release_link,
                     'release_type' => $item->terms->term->value,
                 );
@@ -111,9 +112,12 @@ class Version
         if (!empty($tag)) {
             $major = $this->get_major_version($tag) . '.x';
             $last_release = $this->get_releases($major);
-            $security_releases = $this->get_releases($major, ['tag' => $tag, 'security' => true]);
-            $releases = array_merge($last_release, $security_releases);
-            return $releases;
+
+            if (version_compare($tag, $last_release[0]['version']) === -1) {
+                $security_releases = $this->get_releases($major, ['tag' => $tag, 'security' => true]);
+                $releases = array_merge($last_release, $security_releases);
+                return $releases;
+            }
         }
         return false;
     }
