@@ -1,6 +1,9 @@
 <?php
 
 namespace Gmo\Dsv;
+
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+
 /**
  * Class Version
  */
@@ -42,18 +45,49 @@ class Version
         $tag = isset($filter['tag']) ? $filter['tag'] : '';
         $releases = [];
 
+        // Cache
+        $cache = new FilesystemAdapter();
+        // retrieve the cache item
         if ($version == '8.x') {
-            $url = file_get_contents($this->versions['8.x']);
+            $releasesResults = $cache->getItem('version.releases_results_8x');
         } elseif ($version == '7.x') {
-            $url = file_get_contents($this->versions['7.x']);
-        } else {
-            die('Version Error');
+            $releasesResults = $cache->getItem('version.releases_results_7x');
         }
+
+        if (!$releasesResults->isHit()) {
+            echo 'no cache';
+
+            if ($version == '8.x') {
+                $url = file_get_contents($this->versions['8.x']);
+                // create a new item by trying to get it from the cache
+                $releasesResults = $cache->getItem('version.releases_results_8x');
+            } elseif ($version == '7.x') {
+                $url = file_get_contents($this->versions['7.x']);
+                // create a new item by trying to get it from the cache
+                $releasesResults = $cache->getItem('version.releases_results_7x');
+            } else {
+                die('Version Error');
+            }
+
+            // assign a value to the item and save it
+            $releasesResults->set($url);
+            $cache->save($releasesResults);
+        } else {
+            echo 'cache';
+        }
+
+        // retrieve the value stored by the item
+        $url = $releasesResults->get();
 
         $project = new \SimpleXMLElement($url);
 
         $i = 0;
         foreach ($project->releases[0]->release as $item) {
+
+            if (!empty($tag) && ($item->version == $tag)) {
+                break;
+            }
+
             $flag = false;
 
             if ($security && isset($item->terms->term->value) && $item->terms->term->value == 'Security update') {
@@ -76,10 +110,6 @@ class Version
                 if (!empty($node) && ($i >= $node) && empty($tag)) {
                     break;
                 }
-            }
-
-            if (!empty($tag) && ($item->version == $tag)) {
-                break;
             }
         }
 
