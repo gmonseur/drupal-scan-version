@@ -53,17 +53,21 @@ class DrupalFinder
      */
     private function getStatus($releases)
     {
-        foreach ($releases as $release) {
-            if (empty($release)) {
-                $status = 'Up to date';
-            } else {
-                if ($release['release_type'] == 'Security update') {
-                    $status = 'Security update';
-                    break;
+        if (!empty($releases)) {
+            foreach ($releases as $release) {
+                if (empty($release)) {
+                    $status = 'Up to date';
                 } else {
-                    $status = 'To update';
+                    if ($release['release_type'] == 'Security update') {
+                        $status = 'Security update';
+                        break;
+                    } else {
+                        $status = 'To update';
+                    }
                 }
             }
+        } else {
+            $status = 'Other';
         }
         return $status;
     }
