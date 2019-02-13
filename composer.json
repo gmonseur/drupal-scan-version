@@ -9,7 +9,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "Symfony/Finder": "^4.2"
+    "Symfony/Finder": "^4.2",
+    "symfony/cache": "^4.2"
   },
   "autoload": {
     "psr-4": {
@@ -20,4 +21,3 @@
     "sort-packages": true
   }
 }
-
