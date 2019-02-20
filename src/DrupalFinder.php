@@ -75,19 +75,15 @@ class DrupalFinder
     {
         if (!empty($releases)) {
             foreach ($releases as $release) {
-                if (empty($release)) {
-                    $status = 'Up to date';
+                if ($release['release_type'] == 'Security update') {
+                    $status = 'Security update';
+                    break;
                 } else {
-                    if ($release['release_type'] == 'Security update') {
-                        $status = 'Security update';
-                        break;
-                    } else {
-                        $status = 'To update';
-                    }
+                    $status = 'To update';
                 }
             }
         } else {
-            $status = 'Other';
+            $status = 'Up to date';
         }
         return $status;
     }
