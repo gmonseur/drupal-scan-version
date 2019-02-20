@@ -2,7 +2,7 @@
 require_once 'config.php';
 
 use Gmo\Dsv\DrupalFinder;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Finder\Finder;
 
 prof_flag('Start');
@@ -10,30 +10,28 @@ $path = realpath($config['finder']['path']);
 $depth = $config['finder']['depth'];
 
 // Cache
-$cache = new FilesystemAdapter();
-// retrieve the cache item
-$finderResults = $cache->getItem('finder.finder_results');
+$cache = new FilesystemCache();
 
-if (!$finderResults->isHit()) {
-    echo 'no cache';
+if (!$cache->has('finder.finder_results')) {
+    echo 'no cache finder <br>';
     // Symfony Finder
     $finder = new Finder();
     $finder->in($path)->path(['core/lib', 'includes'])->name(['Drupal.php', 'bootstrap.inc'])->depth($depth);
+    // save in cache
+    $cache->set('finder.finder_results', $finder);
 
-    // create a new item by trying to get it from the cache
-    $finderResults = $cache->getItem('finder.finder_results');
-
-    // assign a value to the item and save it
-    $finderResults->set($finder);
-    $cache->save($finderResults);
-}else{
-    echo 'cache';
+} else {
+    echo 'cache finder <br>';
 }
 // retrieve the value stored by the item
-$finder = $finderResults->get();
+$finder = $cache->get('finder.finder_results');
 
-// remove the cache item
-//$cache->deleteItem('stats.products_count');
+
+// remove the cache key
+//$cache->delete('stats.products_count');
+
+// clear *all* cache keys
+//$cache->clear();
 
 $drupalfinder = new DrupalFinder($finder, $config);
 $websites = $drupalfinder->getContents();

@@ -2,6 +2,8 @@
 
 namespace Gmo\Dsv;
 
+use Symfony\Component\Cache\Simple\FilesystemCache;
+
 /**
  * Class Version
  */
@@ -26,23 +28,41 @@ class DrupalFinder
      */
     public function getContents()
     {
-        foreach ($this->finder as $file) {
-            $contents = $file->getContents();
-            $needle = "VERSION";
-            $pos = strpos($contents, $needle);
-            if ($pos) {
-                $version = substr($contents, $pos + strlen($needle) + 1, 10);
-                $version = getBetween($version, "'", "'");
-                $releases = $this->version->get_last_releases_from_tag($version);
+        // Cache
+        $cache = new FilesystemCache();
 
-                $websites[] = (object)[
-                    'version' => $version,
-                    'path' => $file->getPath(),
-                    'releases' => $releases,
-                    'status' => $this->getStatus($releases)
-                ];
+        if (!$cache->has('finder.websites')) {
+            echo 'no cache websites <br>';
+
+            foreach ($this->finder as $file) {
+                $contents = $file->getContents();
+                $needle = "VERSION";
+                $pos = strpos($contents, $needle);
+                if ($pos) {
+                    $version = substr($contents, $pos + strlen($needle) + 1, 10);
+                    $version = getBetween($version, "'", "'");
+                    $releases = $this->version->get_last_releases_from_tag($version);
+
+                    $websites[] = (object)[
+                        'version' => $version,
+                        'path' => $file->getPath(),
+                        'releases' => $releases,
+                        'status' => $this->getStatus($releases)
+                    ];
+                }
             }
+
+            // save in cache
+            $cache->set('finder.websites', $websites);
+
+        }else{
+            echo 'cache websites<br>';
         }
+
+
+        // retrieve the value stored by the item
+        $websites = $cache->get('finder.websites');
+
         return $websites;
     }
 

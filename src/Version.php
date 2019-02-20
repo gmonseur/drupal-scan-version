@@ -2,7 +2,7 @@
 
 namespace Gmo\Dsv;
 
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Simple\FilesystemCache;
 
 /**
  * Class Version
@@ -46,38 +46,33 @@ class Version
         $releases = [];
 
         // Cache
-        $cache = new FilesystemAdapter();
+        $cache = new FilesystemCache();
         // retrieve the cache item
         if ($version == '8.x') {
-            $releasesResults = $cache->getItem('version.releases_results_8x');
+            $releasesResultsKey = 'version.releases_results_8x';
         } elseif ($version == '7.x') {
-            $releasesResults = $cache->getItem('version.releases_results_7x');
+            $releasesResultsKey = 'version.releases_results_7x';
         }
 
-        if (!$releasesResults->isHit()) {
-            echo 'no cache';
+        if (!$cache->has($releasesResultsKey)) {
+            echo 'no cache releases<br>';
 
             if ($version == '8.x') {
                 $url = file_get_contents($this->versions['8.x']);
-                // create a new item by trying to get it from the cache
-                $releasesResults = $cache->getItem('version.releases_results_8x');
             } elseif ($version == '7.x') {
                 $url = file_get_contents($this->versions['7.x']);
-                // create a new item by trying to get it from the cache
-                $releasesResults = $cache->getItem('version.releases_results_7x');
             } else {
                 die('Version Error');
             }
+            // save in cache
+            $cache->set($releasesResultsKey, $url);
 
-            // assign a value to the item and save it
-            $releasesResults->set($url);
-            $cache->save($releasesResults);
         } else {
-            echo 'cache';
+            echo 'cache releases<br>';
         }
 
         // retrieve the value stored by the item
-        $url = $releasesResults->get();
+        $url = $cache->get($releasesResultsKey);
 
         $project = new \SimpleXMLElement($url);
 
