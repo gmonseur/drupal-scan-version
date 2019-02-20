@@ -30,6 +30,7 @@ class DrupalFinder
     {
         // Cache
         $cache = new FilesystemCache();
+        //$cache->delete('finder.websites');
 
         if (!$cache->has('finder.websites')) {
             echo 'no cache websites <br>';
@@ -55,10 +56,9 @@ class DrupalFinder
             // save in cache
             $cache->set('finder.websites', $websites);
 
-        }else{
+        } else {
             echo 'cache websites<br>';
         }
-
 
         // retrieve the value stored by the item
         $websites = $cache->get('finder.websites');

@@ -93,11 +93,11 @@ class Version
 
             if ($flag) {
                 $releases[$i] = array(
-                    'name' => $item->name,
-                    'version' => $item->version,
+                    'name' => (string)$item->name,
+                    'version' => (string)$item->version,
                     'date' => date("d M Y", (int)$item->date),
-                    'release_link' => $item->release_link,
-                    'release_type' => $item->terms->term->value,
+                    'release_link' => (string)$item->release_link,
+                    'release_type' => (string)$item->terms->term->value,
                 );
 
                 $i++;
