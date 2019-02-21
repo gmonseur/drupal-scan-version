@@ -2,8 +2,9 @@
 require_once 'config.php';
 
 use Gmo\Dsv\DrupalFinder;
-//use Symfony\Component\Cache\Simple\FilesystemCache;
 use Symfony\Component\Finder\Finder;
+
+//use Symfony\Component\Cache\Simple\FilesystemCache;
 
 prof_flag('Start');
 $path = realpath($config['finder']['path']);
@@ -42,48 +43,24 @@ if (isset($_GET['clear_cache'])) {
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 </head>
 <body>
-<?php echo 'Version PHP : ' . phpversion(); ?><br>
-<?php echo 'Info Server: ' . strip_tags($_SERVER['SERVER_SIGNATURE']); ?><br>
-<?php echo 'Host IP : ' . getHostByName(php_uname('n')); ?>
-<nav class="navbar" role="navigation" aria-label="main navigation">
+<nav class="navbar is-spaced" role="navigation" aria-label="main navigation">
     <div class="container">
-        <div class="navbar-item">
-        <div class="navbar-start">
-            <div class="dropdown">
-                <div class="dropdown-trigger">
-                    <button class="button" aria-haspopup="true" aria-controls="dropdown-menu2">
-                        <span>Content</span>
-                        <span class="icon is-small">
-        <i class="fas fa-angle-down" aria-hidden="true"></i>
-      </span>
-                    </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu2" role="menu">
-                    <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            <p>You can insert <strong>any type of content</strong> within the dropdown menu.</p>
-                        </div>
-                        <hr class="dropdown-divider">
-                        <div class="dropdown-item">
-                            <p>You simply need to use a <code>&lt;div&gt;</code> instead.</p>
-                        </div>
-                        <hr class="dropdown-divider">
-                        <a href="#" class="dropdown-item">
-                            This is a link
-                        </a>
-                    </div>
-                </div>
+        <div class="navbar-brand is-marginless">
+            <span
+                class="is-size-2 is-uppercase"><?php echo 'IP ' . getHostByName(php_uname('n')); ?></span>
+            <div class="tags has-addons" style="margin: 12px 15px 0 15px">
+                <span class="tag">Cache Version</span>
+                <span class="tag is-primary"><?php echo $websites['cache_version']; ?></span>
             </div>
-        </div>
+
+            <div class="tags has-addons" style="margin: 12px 15px 0 0">
+                <span class="tag">Php Version</span>
+                <span class="tag is-primary"><?php echo phpversion(); ?></span>
+            </div>
         </div>
 
         <div class="navbar-end">
             <div class="navbar-item">
-                <div class="tags has-addons" style="margin: 10px 15px 0 0">
-                    <span class="tag">Cache Version</span>
-                    <span class="tag is-primary"><?php echo $websites['cache_version']; ?></span>
-                </div>
-
                 <div class="buttons">
                     <a href="/?clear_cache" class="button">
                         Clear Cache
@@ -95,12 +72,20 @@ if (isset($_GET['clear_cache'])) {
     </div>
 </nav>
 
-<section class="section">
+<main class="bd-main">
+    <section class="hero is-primary">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Drupal Scan Version
+                </h1>
+                <h2 class="subtitle">
+                    Versions 7.x - 8.x
+            </div>
+        </div>
+    </section>
+
     <div class="container">
-        <h1 class="title">Drupal Scan Version </h1>
-        <p class="subtitle">
-            Versions 7.x - 8.x
-        </p>
         <?php if (!empty($websites)): ?>
             <table class="table is-hoverable is-fullwidth">
                 <thead>
@@ -158,11 +143,26 @@ if (isset($_GET['clear_cache'])) {
         <?php else: ?>
             <p>No results ...</p>
         <?php endif ?>
-        <p class="content is-small">
-            <?php prof_print(); ?>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>Drupal Scan Version</strong> by <a href="https://gmonseur.be" target="_blank">Grégory Monseur</a>.
+        </p>
+        <p>
+            <span class="icon">
+                <i class="fas fa-clock"></i>
+            </span>
+            Page generated in <?php echo prof_print(true); ?> seconds.
+        </p>
+        <p>
+            <a href="https://bulma.io/" target="_blank">
+                <img src="https://bulma.io/images/made-with-bulma.png" alt="Made with Bulma" width="128" height="24">
+            </a>
         </p>
     </div>
-
-</section>
+</footer>
 </body>
 </html>
