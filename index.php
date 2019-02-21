@@ -47,7 +47,7 @@ if (isset($_GET['clear_cache'])) {
     <div class="container">
         <div class="navbar-brand is-marginless">
             <span
-                class="is-size-2 is-uppercase"><?php echo 'IP ' . getHostByName(php_uname('n')); ?></span>
+                class="is-size-3">Drupal Scan Version</span>
             <div class="tags has-addons" style="margin: 12px 15px 0 15px">
                 <span class="tag">Cache Version</span>
                 <span class="tag is-primary"><?php echo $websites['cache_version']; ?></span>
@@ -73,11 +73,11 @@ if (isset($_GET['clear_cache'])) {
 </nav>
 
 <main class="bd-main">
-    <section class="hero is-primary">
+    <section class="hero is-primary" style="margin-bottom: 20px">
         <div class="hero-body">
             <div class="container">
                 <h1 class="title">
-                    Drupal Scan Version
+                    <?php echo 'IP ' . getHostByName(php_uname('n')); ?>
                 </h1>
                 <h2 class="subtitle">
                     Versions 7.x - 8.x
