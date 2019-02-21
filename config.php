@@ -23,6 +23,7 @@ $config = array(
         '8.x' => 'https://updates.drupal.org/release-history/drupal/8.x',
         '7.x' => 'https://updates.drupal.org/release-history/drupal/7.x'
     ],
+    'cachettl' => 86400, // 1 day
     'finder' => [
         'path' => '../',
         'depth' => ['> 2', '< 6']

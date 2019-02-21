@@ -10,14 +10,22 @@ use Symfony\Component\Cache\Simple\FilesystemCache;
 class Version
 {
     private $versions = [];
+    private $cachettl;
+    private $cache;
+    private $releasesCacheKey = array(
+        '8.x' => 'version.releases_results_8x',
+        '7.x' => 'version.releases_results_7x'
+    );
 
     /**
      * Version constructor.
      * @param $versions
      */
-    public function __construct($versions)
+    public function __construct($versions, $cachettl)
     {
         $this->versions = $versions;
+        $this->cachettl = $cachettl;
+        $this->cache = new FilesystemCache();
     }
 
     /**
@@ -45,18 +53,14 @@ class Version
         $tag = isset($filter['tag']) ? $filter['tag'] : '';
         $releases = [];
 
-        // Cache
-        $cache = new FilesystemCache();
         // retrieve the cache item
         if ($version == '8.x') {
-            $releasesResultsKey = 'version.releases_results_8x';
+            $releasesResultsKey = $this->releasesCacheKey['8.x'];
         } elseif ($version == '7.x') {
-            $releasesResultsKey = 'version.releases_results_7x';
+            $releasesResultsKey = $this->releasesCacheKey['7.x'];
         }
 
-        if (!$cache->has($releasesResultsKey)) {
-            echo 'no cache releases<br>';
-
+        if (!$this->cache->has($releasesResultsKey)) {
             if ($version == '8.x') {
                 $url = file_get_contents($this->versions['8.x']);
             } elseif ($version == '7.x') {
@@ -65,14 +69,11 @@ class Version
                 die('Version Error');
             }
             // save in cache
-            $cache->set($releasesResultsKey, $url);
-
-        } else {
-            echo 'cache releases<br>';
+            $this->cache->set($releasesResultsKey, $url, $this->cachettl);
         }
 
         // retrieve the value stored by the item
-        $url = $cache->get($releasesResultsKey);
+        $url = $this->cache->get($releasesResultsKey);
 
         $project = new \SimpleXMLElement($url);
 
@@ -158,5 +159,15 @@ class Version
             return substr($version, 0, 1);
         }
         return false;
+    }
+
+    /**
+     * Clear Cache Version
+     */
+    public function clear_cache()
+    {
+        foreach ($this->releasesCacheKey as $value) {
+            $this->cache->delete($value);
+        }
     }
 }
