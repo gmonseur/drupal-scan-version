@@ -86,22 +86,29 @@ if (!function_exists('prof_flag')) {
  * Call this when you're done and want to see the results
  */
 if (!function_exists('prof_print')) {
-    function prof_print()
+    function prof_print($total = false)
     {
         global $prof_timing, $prof_names;
         $size = count($prof_timing);
         $prof_tot_time = 0;
-        echo "-- Profiling ---------------------------------<br>";
+        $return = '';
+        $return .= "-- Profiling ---------------------------------<br>";
         for ($i = 0; $i < $size - 1; $i++) {
-            echo "<b>{$prof_names[$i]}</b><br>";
+            $return .= "<b>{$prof_names[$i]}</b><br>";
             $prof_time_fork = $prof_timing[$i + 1] - $prof_timing[$i];
-            echo sprintf("&nbsp;&nbsp;&nbsp;&nbsp;%f<br>", $prof_time_fork);
+            $return .= sprintf("&nbsp;&nbsp;&nbsp;&nbsp;%f<br>", $prof_time_fork);
             $prof_tot_time = $prof_tot_time + $prof_time_fork;
         }
-        echo "<b>{$prof_names[$size-1]}</b><br><br>";
-        echo "<b>Total Time</b><br>";
-        echo "&nbsp;&nbsp;&nbsp;&nbsp; $prof_tot_time<br>";
-        echo "----------------------------------------------<br>";
+        $return .= "<b>{$prof_names[$size-1]}</b><br><br>";
+        $return .= "<b>Total Time</b><br>";
+        $return .= "&nbsp;&nbsp;&nbsp;&nbsp; $prof_tot_time<br>";
+        $return .= "----------------------------------------------<br>";
+
+        if($total){
+           $return = $prof_tot_time;
+        }
+
+        return $return;
     }
 }
 
