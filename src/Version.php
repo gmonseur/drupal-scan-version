@@ -3,6 +3,11 @@
 namespace Gmo\Dsv;
 
 use Symfony\Component\Cache\Simple\FilesystemCache;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 /**
  * Class Version
@@ -26,6 +31,27 @@ class Version
         $this->versions = $versions;
         $this->cachettl = $cachettl;
         $this->cache = new FilesystemCache();
+
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoders);
+
+
+        $test = $this->get_last_releases();
+        $jsonTest = $serializer->serialize($test, 'json');
+
+        $fileSystem = new Filesystem();
+
+        if($fileSystem->exists(['last_releases.txt'])){
+            $current_release = file_get_contents("last_releases.txt");
+            if($current_release === $jsonTest){
+                echo 'ok';
+            }else{
+                echo 'ko';
+            }
+        }else{
+            $fileSystem->dumpFile('last_releases.txt', $jsonTest);
+        }
     }
 
     /**
