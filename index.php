@@ -4,14 +4,9 @@ require_once 'config.php';
 use Gmo\Dsv\DrupalFinder;
 use Symfony\Component\Finder\Finder;
 
-//use Symfony\Component\Cache\Simple\FilesystemCache;
-
 prof_flag('Start');
 $path = realpath($config['finder']['path']);
 $depth = $config['finder']['depth'];
-
-// @todo Cache ???
-//$cache = new FilesystemCache();
 
 // Drupal Finder
 $drupalfinder = new DrupalFinder($config);
